@@ -1,22 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=EUC-KR"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- 
-<%@ page import="java.util.*" %>
-<%@ page import="com.model2.mvc.service.domain.*" %>
-<%@ page import="com.model2.mvc.common.*" %>
-<%@ page import="com.model2.mvc.common.util.*" %>
-<%@ page import="com.model2.mvc.view.user.*" %>
-<%
 
-
-List<Purchase> list= (List<Purchase>)request.getAttribute("list");
-Page resultPage=(Page)request.getAttribute("resultPage");
-
-Search search = (Search)request.getAttribute("search");
-//==> null 을 ""(nullString)으로 변경
-
-%>
- --%>
 
 
 
@@ -43,11 +27,10 @@ Search search = (Search)request.getAttribute("search");
 			self.location = "/user/getUser?userId="+$(this).text().trim()
 				
 		});
-		<c:set var="i" value="0" />
-			<c:forEach var="pur" items="${list }">
-			<c:set var="i" value="${ i +1}" />
-		$( ".ct_list_pop td:nth-child(1)").on("click", function (){
-			self.location = "/purchase/getPurchase?tranNo=${pur.tranNo}"
+		
+		<c:forEach var="i" begin="0" end="${list.size()-1}">
+		$( "#${i+1}").on("click", function (){
+			self.location = "/purchase/getPurchase?tranNo=${list[i].tranNo}"
 		});
 		</c:forEach>
 	});
@@ -106,8 +89,8 @@ Search search = (Search)request.getAttribute("search");
 	<c:forEach var="pur" items="${list }">
 	<c:set var="i" value="${ i+1 }" />
 	<tr class="ct_list_pop">
-		<td align="center">
-			<c:out value="${i }"/>
+		<td align="center" id="${ i }">
+			<c:out value="${ i}"/>
 		</td> 
 		<td></td>
 		<td align="left">

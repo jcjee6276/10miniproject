@@ -43,20 +43,51 @@ $(function() {
 		fncGetProductList(${search.currentPage });
 	});
 	
-	$( ".ct_list_pop td:nth-child(3)").on("click", function() {
-	
-	self.location ="/product/getNameProduct?prodName="+$(this).text().trim()
-	console.log($(this).text().trim());
+	<c:forEach var="i" begin="0" end="${list.size()-1}">
+	$( "#${i+1}").on("click", function() {
+		
+		//var prodNo = ${list.get(0).prodNo}
+		
+		$.ajax(	{
+				url : "/product/json/getProduct/"+${list.get(i).prodNo} ,
+				method : "GET",
+				dataType : "json",
+				headers : {
+					"Accept" : "application/json",
+					"Content-Type" : "application/json"
+						},
+				success : function(JSONData , status) {
+					var displayValue = "<h3>"
+								+"상품번호 : "+JSONData.prodNo+"<br/>"
+								+"상품이름 : "+JSONData.prodName+"<br/>"
+								+"가격 : "+JSONData.price+"<br/>"
+								+"등록일 : "+JSONData.regDateString
+								+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<td>구매</td>"
+								+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<td>상세보기</td>"
+								+"</h3>";
+						$("h3").remove();
+						$( "#"+${list.get(i).prodNo}+"").html(displayValue);
+						
+						
+				
+				}			
+			}
+				);
+		
+	//self.location ="/product/getNameProduct?prodName="+$(this).text().trim()
+	//console.log($(this).text().trim());
 	});
-
+	$("h3.td:contains('구매')").on("click", function(){
+		alert("hi");
+		self.location ="/purchase/addPurchaseView?prodNo=${list.get(i).prodNo}"
+	});
+	</c:forEach>
 	$( ".ct_list_pop td:nth-child(3)" ).css("color" , "red");
 	$("h7").css("color" , "red");
 
 	$(".ct_list_pop:nth-child(4n+6)" ).css("background-color" , "whitesmoke");
 });
-$( function() {
-    $( "#accordion" ).accordion();
-  } );
+
 </script>
 </head>
 
@@ -153,11 +184,11 @@ $( function() {
 	<c:forEach var="prod" items="${list }">
 	<c:set var="i" value="${i+1 }"/>
 	<tr class="ct_list_pop">
-		<div>
+		<div> 
 		<td align="center">${i }</td>
 		<td></td>
 		
-		<td align="left">${prod.prodName }</td>
+		<td  align="left" id="${i }">${prod.prodName }</td>
 		
 		<td></td>
 		<td align="left">${prod.price }</td>
@@ -187,6 +218,9 @@ $( function() {
 		</c:when>
 		</c:choose>
 	</tr>
+	<tr class="ct_list_pop2">
+		<td id="${prod.prodNo }"  colspan="11" bgcolor="D6D7D6" height="1"></td>
+	</tr>
 </c:forEach>
 </c:if>	
 
@@ -198,7 +232,7 @@ $( function() {
 		<td align="center">${i }</td>
 		<td></td>
 		<c:if test="${empty prod.proTranCode}">
-		<td align="left">${prod.prodName }</td>
+		<td align="left" id="${i }">${prod.prodName }</td>
 		</c:if>
 		<c:if test="${not empty prod.proTranCode }">
 		<td>${prod.prodName }</td>
@@ -230,6 +264,11 @@ $( function() {
 		</td>	
 		</c:when>
 		</c:choose>
+	</tr>
+	<tr class="ct_list_pop2">
+		<td id="${prod.prodNo }" colspan="11" bgcolor="D6D7D6" height="1">		
+		</td>
+	
 	</tr>
 </c:forEach>
 </c:if>	

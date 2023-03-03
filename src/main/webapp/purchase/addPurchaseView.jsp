@@ -36,7 +36,8 @@ function fncAddPurchase() {
 		alert("구매자 주소는 반드시 입력하여야 합니다.");
 		return;
 	}
-	$("form").attr("method" , "POST").attr("action" , "/purchase/addPurchase").submit();
+	//$("form").attr("method" , "POST").attr("action" , "/purchase/addPurchase").submit();
+	$("form").attr("method" , "POST").attr("action" , "/kakaoPay").submit();
 }
 	$(function(){
 	$("input[name='manuDate']").datepicker({altField:"input[name='manuDate']",altFormat:"yymmdd"}); 

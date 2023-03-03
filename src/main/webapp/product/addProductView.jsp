@@ -19,6 +19,8 @@
 function fncAddProduct(){
 	//Form 유효성 검증
  	//var name = document.detailForm.prodName.value;
+	
+	
 	//var detail = document.detailForm.prodDetail.value;
 	//var manuDate = document.detailForm.manuDate.value;
 	//var price = document.detailForm.price.value;
