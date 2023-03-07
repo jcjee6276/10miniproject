@@ -1,5 +1,6 @@
 package com.model2.mvc.web.user;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +20,7 @@ import com.model2.mvc.common.Page;
 import com.model2.mvc.common.Search;
 import com.model2.mvc.service.domain.User;
 import com.model2.mvc.service.user.UserService;
+import com.model2.mvc.service.user.impl.KakaoService;
 
 
 //==> 회원관리 Controller
@@ -42,6 +42,9 @@ public class UserController {
 	int pageUnit;
 	@Value("#{commonProperties['pageSize']}")
 	int pageSize;
+	
+	@Autowired
+	private KakaoService ks;
 	
 	
 	@RequestMapping( value="addUser", method=RequestMethod.GET )
@@ -173,4 +176,21 @@ public class UserController {
 		
 		return "forward:/user/listUser.jsp";
 	}
+	
+	@RequestMapping(value="kakaoLogin", method=RequestMethod.POST)
+	public String kakaoLogin(@RequestParam(value = "code", required = false) String code) throws Exception {
+		System.out.println("#########" + code);
+        
+		// 위에서 만든 코드 아래에 코드 추가
+		String access_Token = ks.getAccessToken(code);
+		System.out.println("###access_Token#### : " + access_Token);
+		
+		HashMap<String, Object> userInfo = ks.getUserInfo(access_Token);
+		System.out.println("###access_Token#### : " + access_Token);
+		System.out.println("###nickname#### : " + userInfo.get("nickname"));
+		System.out.println("###email#### : " + userInfo.get("email"));
+        
+        
+		return "/user/login";
+    	}
 }

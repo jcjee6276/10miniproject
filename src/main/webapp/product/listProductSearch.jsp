@@ -43,8 +43,16 @@ $(function() {
 		fncGetProductList(${search.currentPage });
 	});
 	
+	
+	
 	<c:forEach var="i" begin="0" end="${list.size()-1}">
-	$( "#${i+1}").on("click", function() {
+	
+	$("#${i+1}").on("click", function() {
+		self.location ="/purchase/addPurchaseView?prodNo=${list.get(i).prodNo}"
+	});
+	
+	
+	$( "#${i+1}").hover(function() {
 		
 		//var prodNo = ${list.get(0).prodNo}
 		
@@ -61,9 +69,7 @@ $(function() {
 								+"상품번호 : "+JSONData.prodNo+"<br/>"
 								+"상품이름 : "+JSONData.prodName+"<br/>"
 								+"가격 : "+JSONData.price+"<br/>"
-								+"등록일 : "+JSONData.regDateString
-								+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<td>구매</td>"
-								+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<td>상세보기</td>"
+								+"등록일 : "+JSONData.regDateString	
 								+"</h3>";
 						$("h3").remove();
 						$( "#"+${list.get(i).prodNo}+"").html(displayValue);
@@ -77,10 +83,7 @@ $(function() {
 	//self.location ="/product/getNameProduct?prodName="+$(this).text().trim()
 	//console.log($(this).text().trim());
 	});
-	$("h3.td:contains('구매')").on("click", function(){
-		alert("hi");
-		self.location ="/purchase/addPurchaseView?prodNo=${list.get(i).prodNo}"
-	});
+	
 	</c:forEach>
 	$( ".ct_list_pop td:nth-child(3)" ).css("color" , "red");
 	$("h7").css("color" , "red");

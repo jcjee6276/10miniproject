@@ -1,4 +1,6 @@
 package com.model2.mvc.web.product;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,17 +31,23 @@ public class KakaoPayController {
     }
 	
 	@PostMapping("/kakaoPay")
-    public String kakaoPay() {
+    public String kakaoPay(@ModelAttribute() Purchase purchase, User user, Product product,HttpSession session) {
         
-		
-        return "redirect:" + kakaopay.kakaoPayReady();
+		session.getAttribute("user");
+		purchase.setBuyer(user);
+	    purchase.setPurchaseProd(product);
+        return "redirect:" + kakaopay.kakaoPayReady(purchase, product);
  
     }
 	
+	
+	
 	 @GetMapping("/kakaoPaySuccess")
-	    public void kakaoPaySuccess(@RequestParam("pg_token") String pg_token, Model model) {
+	    public String kakaoPaySuccess(@RequestParam("pg_token") String pg_token, Model model) {
 	        System.out.println("pgtoken"+pg_token);
 	        
 	        model.addAttribute("info", kakaopay.kakaoPayInfo(pg_token));
+	        
+	        return "forward:/kakaoPaySuccess.jsp";
 	    }
 }

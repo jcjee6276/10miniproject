@@ -3,6 +3,7 @@ package com.model2.mvc.service.product.impl;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.model2.mvc.service.domain.KakaoPayApprovalVO;
 import com.model2.mvc.service.domain.KakaoPayReadyVO;
+import com.model2.mvc.service.domain.Product;
 import com.model2.mvc.service.domain.Purchase;
 
 @Service
@@ -24,10 +26,11 @@ public class KakaoPay {
     
     private KakaoPayReadyVO kakaoPayReadyVO;
     private KakaoPayApprovalVO kakaoPayApprovalVO;
+    Purchase purchase;
     //private Purchase purchase;
     
     
-    public String kakaoPayReady() {
+    public String kakaoPayReady(Purchase purchase, Product product) {
  
         RestTemplate restTemplate = new RestTemplate();
  
@@ -41,15 +44,18 @@ public class KakaoPay {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
         params.add("cid", "TC0ONETIME");
         params.add("partner_order_id", "1001");
-        params.add("partner_user_id", "gorany");
-        params.add("item_name", "갤럭시S9");
+        params.add("partner_user_id", purchase.getReceiverName());
+        params.add("item_name", "얀진쿤을위한 내 마음!");
         params.add("quantity", "1");
         params.add("total_amount", "2100");
         params.add("tax_free_amount", "100");
         params.add("approval_url", "http://localhost:8080/kakaoPaySuccess");
         params.add("cancel_url", "http://localhost:8080/kakaoPayCancel");
         params.add("fail_url", "http://localhost:8080/kakaoPaySuccessFail");
- 
+        
+        System.out.println("prams 확인 : "+params);
+        System.out.println("넘어온 purchase확인 "+purchase);
+        System.out.println("넘어온 product확인 "+product);
          HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<MultiValueMap<String, String>>(params, headers);
  
         try {
@@ -86,7 +92,7 @@ public class KakaoPay {
         params.add("cid", "TC0ONETIME");
         params.add("tid", kakaoPayReadyVO.getTid());
         params.add("partner_order_id", "1001");
-        params.add("partner_user_id", "gorany");
+        params.add("partner_user_id", purchase.getReceiverName());
         params.add("pg_token", pg_token);
         params.add("total_amount", "2100");
         
