@@ -10,17 +10,23 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
+import com.model2.mvc.service.domain.KakaoUser;
+import com.model2.mvc.service.kakao.KakaoDao;
 
 @Service
 public class KakaoService {
+	
+	@Autowired
+	@Qualifier("KakaoDaoImpl")
+	private KakaoDao kakaoDao;
 	
 	public String getAccessToken(String authorize_code) {
 		String access_Token = "";
@@ -43,7 +49,7 @@ public class KakaoService {
             
 			sb.append("&client_id=04012ee167a54fddf374766087a27fea"); //본인이 발급받은 key
 			sb.append("&redirect_uri=http://127.0.0.1:8080/user/kakaoLogin"); // 본인이 설정한 주소
-            
+            //sb.append("&scope=profaccount_email");
 			sb.append("&code=" + authorize_code);
 			bw.write(sb.toString());
 			bw.flush();
@@ -53,20 +59,20 @@ public class KakaoService {
 			System.out.println("responseCode : " + responseCode);
             
 			// 요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
-			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "EUC-KR"));
 			String line = "";
 			String result = "";
             
 			while ((line = br.readLine()) != null) {
 				result += line;
 			}
-			System.out.println("response body : " + result);
+			System.out.println("response body1 : " + result);
 			
 			ObjectMapper objectMapper = new ObjectMapper();
 			// JSON String -> Map
 			Map<String, Object> jsonMap = objectMapper.readValue(result, new TypeReference<Map<String, Object>>() {
 			});
-
+				
 			access_Token = jsonMap.get("access_token").toString();
 			refresh_Token = jsonMap.get("refresh_token").toString();
 
@@ -75,13 +81,18 @@ public class KakaoService {
             
 			br.close();
 			bw.close();
+			
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return access_Token;
 	}
 	
-	public HashMap<String, Object> getUserInfo(String access_Token) {
+	
+	
+	public HashMap<String, Object> getUserInfo(String access_Token) throws Exception {
 
 		// 요청하는 클라이언트마다 가진 정보가 다를 수 있기에 HashMap타입으로 선언
 		HashMap<String, Object> userInfo = new HashMap<String, Object>();
@@ -93,7 +104,8 @@ public class KakaoService {
 
 			// 요청에 필요한 Header에 포함될 내용
 			conn.setRequestProperty("Authorization", "Bearer " + access_Token);
-
+			
+			
 			int responseCode = conn.getResponseCode();
 			System.out.println("responseCode : " + responseCode);
 
@@ -106,22 +118,54 @@ public class KakaoService {
 				result += line;
 			}
 			System.out.println("response body : " + result);
-
-			JsonParser parser = new JsonParser();
-			JsonElement element = parser.parse(result);
-
-			JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
-			JsonObject kakao_account = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
-
-			String nickname = properties.getAsJsonObject().get("nickname").getAsString();
-			String email = kakao_account.getAsJsonObject().get("email").getAsString();
+			
+			ObjectMapper mapper = new ObjectMapper();
+			
+			//JSONParser parser = new JSONParser(result);
+			JSONObject element = (JSONObject) JSONValue.parse(result);
+		
+			String userId = mapper.readValue(element.get("id").toString(), String.class);
+			System.out.println("id : "+userId);
+			//JSONObject id = mapper.convertValue(element.get("id"), JSONObject.class);
+			JSONObject properties = mapper.convertValue(element.get("properties"), JSONObject.class);
+			System.out.println("properties 형변환 : "+properties);
+			JSONObject kakao_account = mapper.convertValue(element.get("kakao_account"), JSONObject.class);
+			//JSONObject properties =(JSONObject) element.get("properties");
+			//JSONObject kakao_account = (JSONObject) element.get("kakao_account");
+			//String userId = mapper.convertValue(id.toString(), String.class);
+			String nickname = mapper.convertValue(properties.get("nickname"), String.class);
+			String email = mapper.convertValue(kakao_account.get("email"), String.class);
+			//String nickname = (String) element.get("nickname");
+			//String email = (String) element.get("email");
 
 			userInfo.put("nickname", nickname);
 			userInfo.put("email", email);
-
+			userInfo.put("id", userId);
+			System.out.println("#####닉네임"+userInfo.get("nickname"));
+			System.out.println("#####이메일"+userInfo.get("email"));
+			
+			KakaoService ks = new KakaoService(); 
+			
+			
+			
+			if(kakaoDao.checkDuplication(userId)==false) {
+				KakaoUser user = new KakaoUser();
+				user.setUserId(userId);
+				user.setUserName(nickname);
+				user.setEmail(email);
+				kakaoDao.addUser(user);
+			}
+				
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return userInfo;
 	}
+	
+	public KakaoUser getKakaoUser(String userId) throws Exception {
+		KakaoUser user = kakaoDao.getUser(userId);
+		return user;
+	}
+	
 }

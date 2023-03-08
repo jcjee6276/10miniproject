@@ -179,7 +179,7 @@
 				</td>
 			</tr>
 			
-			<c:if test="${ !empty user && user.role == 'user'}">
+			<c:if test="${ !empty user}">
 			<tr>
 				<td class="Depth03">
 					구매이력조회

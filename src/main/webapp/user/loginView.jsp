@@ -94,6 +94,8 @@
 			});
 		});
 		
+		
+		
 	</script>		
 	
 </head>
@@ -220,11 +222,11 @@ a {
                        			<img src="/images/btn_add.gif" width="70" height="20" border="0">
                          </td>
                        </tr>
-                           <a class="kakao" href="https://kauth.kakao.com/oauth/authorize?client_id=04012ee167a54fddf374766087a27fea&redirect_uri=http://127.0.0.1:8080/user/kakaoLogin&response_type=code">
+                           <a href="#" onClick="window.open('https://kauth.kakao.com/oauth/authorize?client_id=04012ee167a54fddf374766087a27fea&scope=profile_nickname,profile_image,account_email&redirect_uri=http://127.0.0.1:8080/user/kakaoLogin&response_type=code','_blank','toolbar=no,location=no,status=no,menubar=no, scrollbars=auto,resizable=no,directories=no,width=400,height=400, top=10,left=10')">
      	<!-- REST_API키 및 REDIRECT_URI는 본인걸로 수정하세요 -->
         
       	<div class="kakao_i"></div>
-      	<div class="kakao_txt">카카오톡으로 간편로그인 </div>
+      	<div class="kakao_txt">카카오톡으로 간편로그인</div>
    	</a>
                      </table>
                  </td>
